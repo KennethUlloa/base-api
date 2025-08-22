@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from uuid import UUID
 
-from schemas.base import DTO
+from app.schemas.base import DTO
 
 
 class PermissionDTO(DTO):
@@ -21,7 +21,7 @@ class PermissionDTO(DTO):
             description=model.description,
             parent_id=model.parent_id,
         )
-    
+
 
 class PermissionCreate(BaseModel):
     name: str

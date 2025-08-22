@@ -1,7 +1,9 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from config.db import DBModel
-from models.tables import role_permission
+
+from app.config.db import DBModel
+from app.models.tables import role_permission
+
 
 class Role(DBModel):
     __tablename__ = "roles"
@@ -11,7 +13,6 @@ class Role(DBModel):
     permissions: Mapped[list["Permission"]] = relationship(
         "Permission",
         secondary=role_permission,
-        back_populates="roles",
         init=False,
         lazy="selectin",
     )

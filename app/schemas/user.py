@@ -1,9 +1,10 @@
 from datetime import datetime
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field
 from uuid import UUID
-from schemas.base import DTO
-from schemas.role import RoleDTO
-from config.values import NOT_MODIFIED
+
+from app.schemas.base import DTO
+from app.schemas.role import RoleDTO
+from app.config.values import NOT_MODIFIED
 
 
 class BaseUser(BaseModel):
@@ -23,7 +24,7 @@ class UserUpdate(BaseUser):
     last_name: str = Field(default=NOT_MODIFIED)
     email: str = Field(default=NOT_MODIFIED)
     username: str = Field(default=NOT_MODIFIED)
-    
+
     class Config:
         arbitrary_types_allowed = True
 
@@ -49,4 +50,3 @@ class UserDTO(DTO, BaseUser):
             updated_at=model.updated_at,
             role=RoleDTO.from_model(model.role),
         )
-

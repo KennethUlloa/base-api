@@ -1,6 +1,8 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from config.db import DBModel
+
+from app.config.db import DBModel
+from app.security.hashing import verify_password
 
 
 class User(DBModel):
@@ -13,3 +15,6 @@ class User(DBModel):
     role_id: Mapped[str] = mapped_column(ForeignKey("roles.id"), nullable=False)
 
     role = relationship("Role", lazy="selectin")
+
+    def verify_password(self, password: str) -> bool:
+        return verify_password(password, self.password)

@@ -3,13 +3,14 @@ from fastapi import Depends
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from config.db import get_session
-from models.role import Role
-from models.tables import role_permission
-from repositories.base import DefaultModelRepository
+
+from app.config.db import get_session
+from app.models.role import Role
+from app.models.tables import role_permission
+from app.repositories.base import DefaultModelRepository
 
 
-class RoleRepository(DefaultModelRepository):
+class RoleRepository(DefaultModelRepository[Role]):
     def __init__(self, session: AsyncSession):
         super().__init__(Role, session)
 

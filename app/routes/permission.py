@@ -1,10 +1,10 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends
-from models.permission import Permission
-from repositories.base import DefaultModelRepository, get_model_repository
-from schemas.permission import PermissionDTO, PermissionCreate, PermissionUpdate
-from schemas.base import Message, PageResponse
-from routers.base import value_or_404, or_404
+from app.models.permission import Permission
+from app.repositories.base import DefaultModelRepository, get_model_repository
+from app.schemas.permission import PermissionDTO, PermissionCreate, PermissionUpdate
+from app.schemas.base import Message, PageResponse
+from app.routes.helpers import value_or_404, or_404
 
 
 router = APIRouter(
@@ -12,6 +12,7 @@ router = APIRouter(
     tags=["Permission"],
     responses={404: {"description": "Not found"}},
 )
+
 
 @router.get("/", response_model=PageResponse[PermissionDTO])
 async def get_permissions(
@@ -45,7 +46,9 @@ async def update_permission(
     permission: PermissionUpdate,
     repo: DefaultModelRepository = Depends(get_model_repository(Permission)),
 ):
-    return PermissionDTO.from_model(or_404(await repo.update(id, **permission.model_dump())))
+    return PermissionDTO.from_model(
+        or_404(await repo.update(id, **permission.model_dump()))
+    )
 
 
 @router.delete("/{id}", response_model=PermissionDTO)

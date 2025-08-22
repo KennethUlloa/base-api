@@ -1,8 +1,8 @@
 from uuid import UUID
 from pydantic import BaseModel, Field
 
-from schemas.base import DTO
-from schemas.permission import PermissionDTO
+from app.schemas.base import DTO
+from app.schemas.permission import PermissionDTO
 
 
 class RoleDTO(DTO):
@@ -17,7 +17,9 @@ class RoleDTO(DTO):
             id=model.id,
             name=model.name,
             description=model.description,
-            permissions=[PermissionDTO.from_model(permission) for permission in model.permissions],
+            permissions=[
+                PermissionDTO.from_model(permission) for permission in model.permissions
+            ],
         )
 
 
@@ -28,6 +30,7 @@ class RoleCreate(BaseModel):
 
 class RoleUpdate(RoleCreate):
     pass
+
 
 class AddPermission(BaseModel):
     role_id: UUID

@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from uuid import UUID
-from routers.base import or_404, value_or_404
-from repositories.base import DefaultModelRepository, get_model_repository
-from schemas.base import PageResponse, Message
-from schemas.user import UserDTO, UserCreate, UserUpdate
-from schemas.role import RoleDTO
-from models.user import User
+from app.routes.helpers import or_404, value_or_404
+from app.repositories.base import DefaultModelRepository, get_model_repository
+from app.schemas.base import PageResponse, Message
+from app.schemas.user import UserDTO, UserCreate, UserUpdate
+from app.models.user import User
 
 
 router = APIRouter(

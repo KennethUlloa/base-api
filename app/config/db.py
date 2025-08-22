@@ -47,9 +47,9 @@ class DBModel(Base, MappedAsDataclass):
 
 
 async def init_db():
-    from models.user import User
-    from models.permission import Permission
-    from models.role import Role
+    from app.models.user import User
+    from app.models.permission import Permission
+    from app.models.role import Role
 
     async with engine.begin() as conn:
         await conn.run_sync(DBModel.metadata.create_all) 
