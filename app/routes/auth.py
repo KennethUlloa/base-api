@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.schemas.security import TokenDTO, AccessToken
-from app.models.user import User
 from app.repositories.user import get_user_repository, UserRepository
 from app.security.auth import create_access_token
 

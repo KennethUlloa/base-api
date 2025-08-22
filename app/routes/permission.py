@@ -5,6 +5,7 @@ from app.repositories.base import DefaultModelRepository, get_model_repository
 from app.schemas.permission import PermissionDTO, PermissionCreate, PermissionUpdate
 from app.schemas.base import Message, PageResponse
 from app.routes.helpers import value_or_404, or_404
+from app.security.auth import user_with_all
 
 
 router = APIRouter(
@@ -19,6 +20,7 @@ async def get_permissions(
     page: int = 1,
     page_size: int = 10,
     repo: DefaultModelRepository = Depends(get_model_repository(Permission)),
+    _ = Depends(user_with_all(["permissions:read"])),
 ):
     data, total = await repo.get_page(page, page_size)
     dto_list = [PermissionDTO.from_model(permission) for permission in data]
@@ -29,13 +31,15 @@ async def get_permissions(
 async def create_permission(
     permission: PermissionCreate,
     repo: DefaultModelRepository = Depends(get_model_repository(Permission)),
+    _ = Depends(user_with_all(["permissions:create"])),
 ):
     return PermissionDTO.from_model(await repo.create(**permission.model_dump()))
 
 
 @router.get("/{id}", response_model=PermissionDTO)
 async def get_permission(
-    id: UUID, repo: DefaultModelRepository = Depends(get_model_repository(Permission))
+    id: UUID, repo: DefaultModelRepository = Depends(get_model_repository(Permission)),
+    _ = Depends(user_with_all(["permissions:read"])),
 ):
     return PermissionDTO.from_model(or_404(await repo.get(id)))
 
@@ -45,6 +49,7 @@ async def update_permission(
     id: UUID,
     permission: PermissionUpdate,
     repo: DefaultModelRepository = Depends(get_model_repository(Permission)),
+    _ = Depends(user_with_all(["permissions:update"])),
 ):
     return PermissionDTO.from_model(
         or_404(await repo.update(id, **permission.model_dump()))
@@ -53,6 +58,7 @@ async def update_permission(
 
 @router.delete("/{id}", response_model=PermissionDTO)
 async def delete_permission(
-    id: UUID, repo: DefaultModelRepository = Depends(get_model_repository(Permission))
+    id: UUID, repo: DefaultModelRepository = Depends(get_model_repository(Permission)),
+    _ = Depends(user_with_all(["permissions:delete"])),
 ):
     return value_or_404(await repo.delete(id), Message(message="Permission deleted"))
