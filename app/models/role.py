@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.config.db import DBModel
 from app.models.tables import role_permission
+from app.models.permission import Permission
 
 
 class Role(DBModel):

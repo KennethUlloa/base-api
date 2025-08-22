@@ -16,3 +16,7 @@ ALGORITHM = "HS256"
 
 # AUTH
 TOKEN_URL = "/auth/token"
+
+# Permissions
+SUPER_ADMIN_NAME = os.getenv("SUPER_ADMIN_NAME")
+

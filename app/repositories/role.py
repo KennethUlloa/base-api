@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.config.db import get_session
+from app.models.permission import Permission
 from app.models.role import Role
 from app.models.tables import role_permission
 from app.repositories.base import DefaultModelRepository
@@ -51,7 +52,9 @@ class RoleRepository(DefaultModelRepository[Role]):
             .where(self.model.deleted_at == None)
             .limit(page_size)
             .offset((page - 1) * page_size)
-            .options(selectinload(self.model.permissions))
+            .options(
+                selectinload(self.model.permissions)
+            )
         ), (
             select(func.count())
             .select_from(self.model)

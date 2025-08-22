@@ -2,14 +2,13 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from app.schemas.base import DTO
-from app.schemas.permission import PermissionDTO
 
 
 class RoleDTO(DTO):
     id: UUID
     name: str
     description: str
-    permissions: list | None = Field(default=[])
+    permissions: list[str] = Field(default=[])
 
     @classmethod
     def from_model(cls, model):
@@ -18,7 +17,7 @@ class RoleDTO(DTO):
             name=model.name,
             description=model.description,
             permissions=[
-                PermissionDTO.from_model(permission) for permission in model.permissions
+                permission.name for permission in model.permissions
             ],
         )
 

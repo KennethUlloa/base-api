@@ -4,7 +4,7 @@ from app.routes.helpers import value_or_404, or_404
 from app.repositories.role import get_role_repository, RoleRepository
 from app.schemas.base import Message, PageResponse
 from app.schemas.role import RoleCreate, RoleDTO, RoleUpdate
-from app.security.auth import get_current_user
+from app.security.auth import user_with_all
 
 
 router = APIRouter(
@@ -19,7 +19,7 @@ async def get_roles(
     page: int = 1,
     page_size: int = 10,
     repo: RoleRepository = Depends(get_role_repository),
-    current_user = Depends(get_current_user),
+    _ = Depends(user_with_all(["roles:create", "users:read"])),
 ):
     data, total = await repo.get_page(page, page_size)
     dto_list = [RoleDTO.from_model(role) for role in data]

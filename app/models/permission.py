@@ -11,10 +11,18 @@ class Permission(DBModel):
     parent_id: Mapped[str | None] = mapped_column(
         ForeignKey("permissions.id"), nullable=True
     )
+
     parent: Mapped["Permission | None"] = relationship(
         "Permission",
         remote_side="Permission.id",
-        backref="children",
+        back_populates="children",
         lazy="selectin",
-        init=False
+        default=None
+    )
+
+    children: Mapped[list["Permission"]] = relationship(
+        "Permission",
+        back_populates="parent",
+        lazy="selectin",
+        default_factory=list
     )

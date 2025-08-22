@@ -1,52 +1,68 @@
-from sqlalchemy import select, delete as sql_delete
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.role import Role
 from app.models.tables import role_permission
 from app.models.permission import Permission
 
+from .base import Seeder
 
-async def store(session: AsyncSession, role: Role, permission_list: list[str]) -> Role:
-    session.add(role)
-    await session.commit()
-    await session.refresh(role)
 
-    permissions = (
-        (
-            await session.execute(
-                select(Permission)
-                .column(Permission.id)
-                .where(Permission.name.in_(permission_list))
-            )
+class RoleSeeder(Seeder):
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(Role, session)
+
+    async def seed(self):
+        superadmin = await self.create_or_update(
+            "name",
+            name="super-admin",
+            description="Super Admin role",
         )
-        .scalars()
-        .all()
-    )
 
-    role_permissions = [
-        {"role_id": role.id, "permission_id": p.id} for p in permissions
-    ]
+        admin = await self.create_or_update(
+            "name",
+            name="admin",
+            description="Admin role",
+        )
 
-    await session.execute(role_permission.insert(), role_permissions)
-    return role
+        user = await self.create_or_update(
+            "name",
+            name="user",
+            description="User role",
+        )
 
+        permissions = {
+            superadmin.id: ["users:all", "roles:all", "permissions:all", "profile:all"],
+            admin.id: ["users:all", "roles:read", "permissions:read", "profile:read"],
+            user.id: ["users:read", "profile:read"],
+        }
 
-async def seed(session: AsyncSession):
-    await store(
-        session,
-        Role(name="super-admin", description="Super Admin role"),
-        ["users:all", "roles:all"],
-    )
+        combinations = []
 
-    await store(
-        session,
-        Role(name="admin", description="Admin role"),
-        ["users:all", "roles:read"],
-    )
+        await self.session.execute(
+            delete(role_permission).where(role_permission.c.role_id.in_(permissions.keys()))
+        )
 
+        for role_id in permissions:
+            permissions_list = permissions[role_id]
+            permission_ids = (await self.session.execute(
+                select(Permission.id).where(Permission.name.in_(permissions_list))
+            )).scalars().all()
 
-async def delete(session: AsyncSession):
-    # await session.execute(role_permission.delete())
-    print("Deleting roles...")
-    await session.execute(sql_delete(Role))
-    await session.commit()
+            for permission_id in permission_ids:
+                combinations.append((role_id, permission_id))
+
+        await self.session.execute(
+            role_permission.insert(),
+            [
+                {"role_id": role_id, "permission_id": permission_id}
+                for role_id, permission_id in combinations
+            ],
+        )
+
+        await self.session.commit()
+
+    async def delete(self):
+        await self.session.execute(delete(Role))
+        await self.session.execute(delete(role_permission))
+        await self.session.commit()

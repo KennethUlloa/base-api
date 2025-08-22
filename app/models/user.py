@@ -14,7 +14,7 @@ class User(DBModel):
     password: Mapped[str]
     role_id: Mapped[str] = mapped_column(ForeignKey("roles.id"), nullable=False)
 
-    role = relationship("Role", lazy="selectin")
+    role: Mapped["Role"] = relationship("Role", lazy="selectin", init=False)
 
     def verify_password(self, password: str) -> bool:
         return verify_password(password, self.password)
